@@ -34,8 +34,11 @@
 # - Use a different, free-threaded Python implementation (Jython, IronPython)
 # - User Python as a wrapper for third-party lbraries (C/C++) -> numpy, scipy
 
-from threading import Thread, Lock
+from threading import Thread, Lock, current_thread
+from queue import Queue
 import time
+
+############# NOT THREAD SAFE
 
 # def square_numbers():
 #     for i in range(100):
@@ -60,41 +63,78 @@ import time
 
 # print('end main')
 
-database_value = 0
+############# THREAD SAFE
 
-def increase(lock):
-    global database_value
+# database_value = 0
 
-    lock.acquire()
-    local_copy = database_value
-    local_copy += 1
-    time.sleep(0.1)
-    database_value = local_copy
-    lock.release()
+# def increase(lock):
+#     global database_value
 
-if __name__ == '__main__':
+#     # can use context manager with locks
+#     with lock:
+#         local_copy = database_value
+#         local_copy += 1
+#         time.sleep(0.1)
+#         database_value = local_copy
+#     # could use lock.acquire() then finish with lock.release()
 
-    lock = Lock()
-    print('start value', database_value)
+# if __name__ == '__main__':
 
-    thread1 = Thread(target=increase, args=(lock,))
-    thread2 = Thread(target=increase, args=(lock,))
+#     lock = Lock()
+#     print('start value', database_value)
 
-    thread1.start()
-    thread2.start()
+#     thread1 = Thread(target=increase, args=(lock,))
+#     thread2 = Thread(target=increase, args=(lock,))
 
-    thread1.join()
-    thread2.join()
+#     thread1.start()
+#     thread2.start()
 
-    print('end value', database_value)
+#     thread1.join()
+#     thread2.join()
 
-    print('end main')
+#     print('end value', database_value)
+
+#     print('end main')
+
+############# QUEING AND BACKGROUND
+
+# def worker(q, lock):
+#     # this would normally be infinate but as its a background thread it stops when the main thread stops
+#     while True:
+#         value = q.get()
+
+#         # processing...
+#         with lock:
+#             print(f'in {current_thread().name} got {value}')
+#             q.task_done()
+
+# if __name__ == '__main__':
+#     # A queue creates a first in first out list
+#     q = Queue()
+#     lock = Lock()
+#     num_threads = 10
+
+#     for i in range(num_threads):
+#         thread = Thread(target=worker, args=(q, lock))
+#         # daemon puts the process in the background
+#         Thread.daemon=True
+#         thread.start()
+
+#     for i in range(1, 21):
+#         q.put(i)
+    
+#     q.join()
+
+#     print('end main')
 
 ############################# PROCESSING
 
-# from multiprocessing import Process
-# import time
-# import os
+from multiprocessing import Process, Value, Array, Lock, Pool
+from multiprocessing import Queue
+import time
+import os
+
+########## DOES NOT WORK
 
 # def process():
 #     def square_numbers():
@@ -114,16 +154,17 @@ if __name__ == '__main__':
 #     for p in processes:
 #         p.start()
 
-    #join
-    # for p in processes:
-        # p.join()
+#     join
+#     for p in processes:
+#         p.join()
 
-    # print('end main')
+#     print('end main')
 
 # if __name__ == '__main__':
     # freeze_support()
     # process()
 
+########## NOT SURE HOW THIS WORKS - FOUND ON INTERNET
 
 # import multiprocessing as mp  
 # import time  
@@ -138,3 +179,76 @@ if __name__ == '__main__':
 #     pool.map(test_function, [i for i in range(4)])  
 #     pool.close()  
 #     pool.join()  
+
+########## LOCKING
+
+# def add_100(numbers, lock):
+#     for i in range(100):
+#         time.sleep(0.01)
+#         # Lock allows only one process or thread to change it at a time
+#         for i in range(len(numbers)):
+#             with lock:
+#                 numbers[i] += 1
+
+
+# if __name__ == '__main__':
+
+#         lock = Lock()
+#         shared_array = Array('d', [0.0, 100.0, 200.0])
+#         print('Number at beginning is', shared_array[:])
+
+#         p1 = Process(target=add_100, args=(shared_array, lock))
+#         p2 = Process(target=add_100, args=(shared_array, lock))
+
+#         p1.start()
+#         p2.start()
+
+#         p1.join()
+#         p2.join()
+
+#         print('array at end is', shared_array[:])
+
+########## QUEING
+# If it matters what order processes begin
+
+# def square(numbers, queue):
+#     for i in numbers:
+#         queue.put(i * i)
+
+# def make_negative(numbers, queue):
+#     for i in numbers:
+#         queue.put(-1 * i)
+
+# if __name__ == '__main__':
+
+#     numbers = range(1, 6)
+#     q = Queue()
+
+#     p1 = Process(target=square, args=(numbers, q))
+#     p2 = Process(target=make_negative, args=(numbers, q))
+
+#     p1.start()
+#     p2.start()
+
+#     p1.join()
+#     p2.join()
+
+#     while not q.empty():
+#         print(q.get())
+
+########## POOL
+
+def cube(number):
+    return number * number * number
+
+if __name__ == '__main__':
+
+    numbers = range(10)
+    pool = Pool()
+
+    # pool creates as many processes as possible to run the function on paralell processes
+    result = pool.map(cube, numbers)
+
+    pool.close()
+    pool.join()
+    print(result)
