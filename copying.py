@@ -19,7 +19,7 @@ p2.age = 28
 print(p2.age)
 print(p1.age)
 
-# make deep copy
+# make deep copy 
 org = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9]]
 cpy = copy.deepcopy(org)
 cpy[0][1] = -10
