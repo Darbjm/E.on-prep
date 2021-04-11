@@ -4,9 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-django-graphql-jwt = "==0.3.0"
-django-graphql-auth = "*"
+mypy = "*"
 
 [dev-packages]
 
