@@ -7,6 +7,7 @@ name = "pypi"
 django = "*"
 django-graphql-jwt = "==0.3.0"
 django-graphql-auth = "*"
+sendgrid = "*"
 
 [dev-packages]
 
