@@ -1,7 +1,7 @@
 {
-    "python.pythonPath": "/Users/jamesdarby/.local/share/virtualenvs/Slack-dJe9jNEI/bin/python",
+    "python.pythonPath": "/Users/Jamesdarby/.local/share/virtualenvs/Slack-qzYMykio/bin/python",
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "autopep8"
 }

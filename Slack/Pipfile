@@ -7,6 +7,9 @@ name = "pypi"
 python-dotenv = "*"
 slackclient = "*"
 flask = "*"
+autopep8 = "*"
+slack-bolt = "*"
+requests = "*"
 
 [dev-packages]
 
